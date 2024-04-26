@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig;
 import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig;
 import at.hannibal2.skyhanni.config.features.dev.DevConfig;
+import at.hannibal2.skyhanni.config.features.discord.DiscordConfig;
 import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig;
 import at.hannibal2.skyhanni.config.features.event.EventConfig;
 import at.hannibal2.skyhanni.config.features.fishing.FishingConfig;
@@ -143,6 +144,10 @@ public class Features extends Config {
     @Expose
     @Category(name = "Chat", desc = "Change how the chat looks.")
     public ChatConfig chat = new ChatConfig();
+
+    @Expose
+    @Category(name = "Discord Webhook", desc = "Discord Webhook settings.")
+    public DiscordConfig discord = new DiscordConfig();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")

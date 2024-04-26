@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class PestSpawnConfig {
 
@@ -52,4 +54,30 @@ public class PestSpawnConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showTitle = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Send to Discord",
+        desc = "Send a message to Discord when a pest spawns."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean sendToDiscord = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Discord ID to Ping",
+        desc = "The Discord ID to ping when a pest spawns."
+    )
+    @ConfigEditorText
+    public Property<String> discordIdToPing = Property.of("");
+
+    @Expose
+    @ConfigOption(
+        name = "Allow disconnect",
+        desc = "Allow disconnecting from the server."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean allowDisconnect = false;
 }

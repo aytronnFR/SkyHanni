@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -38,11 +39,19 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.discordwebhook.DiscordMessage
+import at.hannibal2.skyhanni.utils.discordwebhook.DiscordWebhookUtils
+import at.hannibal2.skyhanni.utils.discordwebhook.Embed
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiMainMenu
+import net.minecraft.client.gui.GuiMultiplayer
+import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
 
 object GardenAPI {
@@ -111,8 +120,37 @@ object GardenAPI {
         DelayedRun.runDelayed(2.seconds) {
             if (inGarden()) {
                 checkItemInHand()
+            } else {
+                if (config.pests.pestSpawn.allowDisconnect) {
+                    config.pests.pestSpawn.allowDisconnect = false
+                    Minecraft.getMinecraft().theWorld.sendQuittingDisconnectingPacket()
+                    Minecraft.getMinecraft().loadWorld(null as WorldClient?)
+                    Minecraft.getMinecraft().displayGuiScreen(GuiMultiplayer(GuiMainMenu()))
+                    sendDiscordAfkMessage()
+                }
             }
         }
+    }
+
+    fun sendDiscordAfkMessage() {
+        val message = DiscordMessage(
+            content = "",
+            tts = false,
+            embeds = listOf(
+                Embed(
+                    title = "Disconnected!",
+                    description = "<@${PestAPI.config.pestSpawn.discordIdToPing.get()}> You have been disconnected for inactivity!",
+                    color = 15409955,
+                    fields = listOf(),
+                    timestamp = Instant.now().toString()
+                )
+            ),
+            components = listOf(),
+            actions = mapOf(),
+            username = "Garden",
+            avatar_url = "https://wiki.hypixel.net/images/5/57/SkyBlock_renders_the_garden.png"
+        )
+        DiscordWebhookUtils.sendWebhookNotification(message)
     }
 
     private fun updateGardenTool() {

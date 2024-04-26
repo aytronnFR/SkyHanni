@@ -26,13 +26,24 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.discordwebhook.DiscordMessage
+import at.hannibal2.skyhanni.utils.discordwebhook.DiscordWebhookUtils
+import at.hannibal2.skyhanni.utils.discordwebhook.Embed
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiMainMenu
+import net.minecraft.client.gui.GuiMultiplayer
+import net.minecraft.client.multiplayer.WorldClient
+import net.minecraft.realms.RealmsBridge
+import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
+import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
 
 object PestAPI {
@@ -166,7 +177,49 @@ object PestAPI {
             }
         }
         if (!event.unknownAmount) scoreboardPests += event.amountPests
+        if (config.pestSpawn.sendToDiscord && scoreboardPests > 3) {
+            sendDiscordMessage()
+        }
+        if (config.pestSpawn.allowDisconnect && scoreboardPests > 7) {
+            GardenAPI.config.pests.pestSpawn.allowDisconnect = false
+            Minecraft.getMinecraft().theWorld.sendQuittingDisconnectingPacket()
+            Minecraft.getMinecraft().loadWorld(null as WorldClient?)
+            Minecraft.getMinecraft().displayGuiScreen(GuiMultiplayer(GuiMainMenu()))
+            GardenAPI.sendDiscordAfkMessage()
+        }
         updatePests()
+    }
+
+    private fun sendDiscordMessage() {
+        val reducePercentage = when (scoreboardPests) {
+            4 -> "5"
+            5 -> "15"
+            6 -> "30"
+            7 -> "50"
+            8 -> "75"
+            else -> "Err"
+        }
+
+        val pestName = StringUtils.pluralize(scoreboardPests, "Pest")
+
+        val message = DiscordMessage(
+            content = "",
+            tts = false,
+            embeds = listOf(
+                Embed(
+                    title = "$scoreboardPests $pestName on your garden!",
+                    description = "<@${config.pestSpawn.discordIdToPing.get()}> ☘ Farming Fortune has been reduced by $reducePercentage%!",
+                    color = 15409955,
+                    fields = listOf(),
+                    timestamp = Instant.now().toString()
+                )
+            ),
+            components = listOf(),
+            actions = mapOf(),
+            username = "Garden",
+            avatar_url = "https://wiki.hypixel.net/images/5/57/SkyBlock_renders_the_garden.png"
+        )
+        DiscordWebhookUtils.sendWebhookNotification(message)
     }
 
     @SubscribeEvent
@@ -231,6 +284,7 @@ object PestAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!GardenAPI.inGarden()) return
+        Minecraft.getMinecraft().isGamePaused
         if (!firstScoreboardCheck && gardenJoinTime.passedSince() > 5.seconds) {
             checkScoreboardLines(ScoreboardData.sidebarLinesFormatted)
             firstScoreboardCheck = true
