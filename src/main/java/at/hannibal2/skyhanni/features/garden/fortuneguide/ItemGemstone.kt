@@ -1,11 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingGemstone.FINE_PERIDOT
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingGemstone.FLAWED_PERIDOT
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingGemstone.FLAWLESS_PERIDOT
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingGemstone.PERFECT_PERIDOT
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingGemstone.ROUGH_PERIDOT
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import net.minecraft.item.ItemStack
 

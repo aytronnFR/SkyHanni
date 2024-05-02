@@ -19,6 +19,7 @@ enum class FortuneStats(val label: String, val tooltip: String) {
     SUNDER("§2Sunder Enchantment", "§7§2Fortune for each enchantment level\n§2You get 12.5☘ per level"),
     CULTIVATING("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n§2You get 2☘ per level"),
     TURBO("§2Turbo-Crop Enchantment", "§7§2Fortune for each enchantment level\n§2You get 5☘ per level"),
+    PESTERMINATOR("§2Pesterminator Enchantment", "§7§2Fortune for each enchantment level\n§2You get 1☘ per level"),
     DEDICATION("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n§2and crop milestone"),
     EXPORTED_CARROT(
         "§2Exportable Carrots",

@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraft.stats.AchievementList.enchantments
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 import kotlin.math.log10
