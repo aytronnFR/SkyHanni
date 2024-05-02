@@ -277,6 +277,16 @@ object SkyBlockItemModifierUtils {
 
             fun getByName(name: String) = entries.firstOrNull { it.name == name }
         }
+
+        fun getUpgrade(): GemstoneQuality? {
+            return when (this) {
+                ROUGH -> FLAWED
+                FLAWED -> FINE
+                FINE -> FLAWLESS
+                FLAWLESS -> PERFECT
+                PERFECT -> null  // Il n'y a pas de niveau supérieur à PERFECT
+            }
+        }
     }
 
     enum class GemstoneType(val displayName: String) {

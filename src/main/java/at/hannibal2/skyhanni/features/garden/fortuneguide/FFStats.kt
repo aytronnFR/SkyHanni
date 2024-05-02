@@ -103,28 +103,33 @@ object FFStats {
                 cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
                 cropPage[FortuneStats.COLLECTION] = Pair(FarmingFortuneDisplay.getCollectionFortune(tool), 48.0)
                 cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
+                cropPage[FortuneStats.GEMSTONE] = Pair(FarmingFortuneDisplay.gemstoneFortune, 30.0)
             }
 
             in dicerCrops -> {
                 cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
+                cropPage[FortuneStats.GEMSTONE] = Pair(FarmingFortuneDisplay.gemstoneFortune, 20.0)
             }
 
             CropType.MUSHROOM -> {
                 cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 30.0)
                 cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
                 cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                cropPage[FortuneStats.GEMSTONE] = Pair(FarmingFortuneDisplay.gemstoneFortune, 20.0)
             }
 
             CropType.COCOA_BEANS -> {
                 cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 20.0)
                 cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                cropPage[FortuneStats.GEMSTONE] = Pair(FarmingFortuneDisplay.gemstoneFortune, 20.0)
             }
 
             CropType.CACTUS -> {
                 cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
                 cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                cropPage[FortuneStats.GEMSTONE] = Pair(FarmingFortuneDisplay.gemstoneFortune, 20.0)
             }
 
             else -> {}
@@ -150,6 +155,7 @@ object FFStats {
         out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
         out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
+        out[FFTypes.GEMSTONE] = FarmingFortuneDisplay.gemstoneFortune
         out[FFTypes.GREEN_THUMB] = FarmingFortuneDisplay.greenThumbFortune
         out[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
         out[FFTypes.TOTAL] = out.values.sum()
@@ -160,6 +166,8 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         out[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
         out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
+        out[FFTypes.GEMSTONE] = FarmingFortuneDisplay.gemstoneFortune
+        out[FFTypes.PESTERMINATOR] = FarmingFortuneDisplay.pesterminatorFortune
         out[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
         out[FFTypes.TOTAL] = out.values.sum()
     }

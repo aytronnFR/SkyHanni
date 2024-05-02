@@ -10,25 +10,30 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingGemstone
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
+import net.minecraft.stats.AchievementList.enchantments
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 import kotlin.math.log10
@@ -83,8 +88,10 @@ object FarmingFortuneDisplay {
 
     var displayedFortune = 0.0
     var reforgeFortune = 0.0
+    var gemstoneFortune = 0.0
     var itemBaseFortune = 0.0
     var greenThumbFortune = 0.0
+    var pesterminatorFortune = 0.0
 
     private var foundTabUniversalFortune = false
     private var foundTabCropFortune = false
@@ -305,6 +312,7 @@ object FarmingFortuneDisplay {
     fun getSunderFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5
     fun getHarvestingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5
     fun getCultivatingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0
+    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("pesterminator") ?: 0) * 1.0
 
     fun getAbilityFortune(item: ItemStack?) = item?.let {
         getAbilityFortune(it.getInternalName(), it.getLore())
@@ -334,22 +342,31 @@ object FarmingFortuneDisplay {
     fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double) {
         displayedFortune = 0.0
         reforgeFortune = 0.0
+        gemstoneFortune = 0.0
         itemBaseFortune = 0.0
         greenThumbFortune = 0.0
+        pesterminatorFortune = 0.0
 
         //TODO code cleanup
+
+        tool?.getGemstones()?.forEach {
+            if (it.type == SkyBlockItemModifierUtils.GemstoneType.PERIDOT) {
+                gemstoneFortune += FarmingGemstone[it.type, it.quality]?.let { gemstone ->
+                    gemstone[tool.getItemRarityOrCommon().id] ?: 0.0
+                } ?: 0.0
+            }
+        }
 
         for (line in tool?.getLore()!!) {
             tooltipFortunePattern.matchMatcher(line) {
                 displayedFortune = group(1)!!.toDouble()
                 reforgeFortune = group(2)?.toDouble() ?: 0.0
             } ?: continue
-
             itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) {
                 5.0
             } else {
                 val dummiesFF = (tool.getFarmingForDummiesCount() ?: 0) * 1.0
-                displayedFortune - reforgeFortune - enchantmentFortune - dummiesFF
+                displayedFortune - reforgeFortune - enchantmentFortune - dummiesFF - gemstoneFortune
             }
             greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
                 displayedFortune - reforgeFortune - itemBaseFortune

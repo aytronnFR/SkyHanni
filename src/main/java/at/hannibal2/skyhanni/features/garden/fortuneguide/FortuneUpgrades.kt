@@ -17,8 +17,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import net.minecraft.item.ItemStack
@@ -129,8 +131,19 @@ object FortuneUpgrades {
             // todo skip if it doesnt exist -> tell them to buy it later
 
             if (FFGuideGUI.isFallbackItem(item)) return
-
+            val enchantments = item.getEnchantments() ?: emptyMap()
+            val pesterminatorLvl = enchantments["pesterminator"] ?: 0
+            if (pesterminatorLvl != 5) {
+                genericUpgrades.add(
+                    FortuneUpgrade(
+                        "§7Enchant your ${item.displayName} §7with Pesterminator ${pesterminatorLvl + 1}",
+                        null, "PESTERMINATOR;1", getNeededBooks(pesterminatorLvl), 1.0
+                    )
+                )
+            }
+            item.getInternalName().itemName.contains("")
             recombobulateItem(item, genericUpgrades)
+            gemstoneUpgradeItem(item, genericUpgrades)
             when (item.getReforgeName()) {
                 "mossy" -> {}
                 "bustling" -> {
@@ -246,6 +259,7 @@ object FortuneUpgrades {
             )
         }
         recombobulateItem(tool, cropSpecificUpgrades)
+        gemstoneUpgradeItem(tool, genericUpgrades)
         when (tool.getReforgeName()) {
             "blessed" -> {}
             "bountiful" -> {}
@@ -254,6 +268,49 @@ object FortuneUpgrades {
             }
         }
         cropSpecificUpgrades.populateAndSort(0)
+    }
+
+    private fun gemstoneUpgradeItem(item: ItemStack, list: MutableList<FortuneUpgrade>) {
+        val itemGemstone = ItemGemstone[item] ?: return
+        val currentGemstones = item.getGemstones() ?: return
+
+        val nbEmptyGemstoneSlot = itemGemstone.nbPeridotSlot - currentGemstones.size
+        if (nbEmptyGemstoneSlot > 0) {
+            handleEmptyGemstoneSlots(item, list, nbEmptyGemstoneSlot)
+        }
+        if (currentGemstones.isNotEmpty()) {
+            handleFullGemstoneSlots(item, currentGemstones, list)
+        }
+    }
+
+    private fun handleEmptyGemstoneSlots(item: ItemStack, list: MutableList<FortuneUpgrade>, nbEmptySlot: Int) {
+        val gemstone = FarmingGemstone.ROUGH_PERIDOT
+        val rarity = item.getItemRarityOrCommon().id
+        list.add(
+            FortuneUpgrade(
+                "§7Add $nbEmptySlot ${gemstone.displayName} Gemstone to your ${item.displayName}",
+                null, gemstone.gemstoneItem, nbEmptySlot, gemstone[rarity]
+            )
+        )
+    }
+
+    private fun handleFullGemstoneSlots(item: ItemStack, gemstones: List<SkyBlockItemModifierUtils.GemstoneSlot>, list: MutableList<FortuneUpgrade>) {
+        gemstones.forEach { gemstone ->
+            val upgrade = gemstone.quality.getUpgrade() ?: return
+            val gemstoneType = FarmingGemstone[gemstone.type, upgrade]
+            val previousGemstoneType = FarmingGemstone[gemstone.type, gemstone.quality]
+            val rarity = item.getItemRarityOrCommon().id
+
+            gemstoneType?.let {
+                val increase = it[rarity, previousGemstoneType?.get(rarity) ?: 0.0]
+                list.add(
+                    FortuneUpgrade(
+                        "§7Upgrade ${previousGemstoneType?.displayName} Gemstone to ${it.displayName} on your ${item.displayName}",
+                        null, it.gemstoneItem, 1, increase
+                    )
+                )
+            }
+        }
     }
 
     private fun recombobulateItem(item: ItemStack, list: MutableList<FortuneUpgrade>) {
@@ -265,7 +322,16 @@ object FortuneUpgrades {
         } ?: return
 
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        val increase = reforge[item.getItemRarityOrCommon().id + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
+        val increaseByReforge = reforge[item.getItemRarityOrCommon().id + 1, FarmingFortuneDisplay.reforgeFortune] ?: return
+        var increaseByGemstone = 0.0
+        item.getGemstones()?.forEach {
+            if (it.type == SkyBlockItemModifierUtils.GemstoneType.PERIDOT) {
+                increaseByGemstone += FarmingGemstone[it.type, it.quality]?.let { gemstone ->
+                    gemstone[item.getItemRarityOrCommon().id + 1, gemstone[item.getItemRarityOrCommon().id] ?: 0.0 ] ?: 0.0
+                } ?: 0.0
+            }
+        }
+        val increase = increaseByReforge + increaseByGemstone
         list.add(
             FortuneUpgrade("§7Recombobulate your ${item.displayName}", null, "RECOMBOBULATOR_3000", 1, increase)
         )

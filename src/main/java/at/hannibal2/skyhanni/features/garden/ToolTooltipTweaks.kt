@@ -50,6 +50,8 @@ class ToolTooltipTweaks {
         val sunderFortune = FarmingFortuneDisplay.getSunderFortune(itemStack)
         val harvestingFortune = FarmingFortuneDisplay.getHarvestingFortune(itemStack)
         val cultivatingFortune = FarmingFortuneDisplay.getCultivatingFortune(itemStack)
+        val pesterminatorFortune = FarmingFortuneDisplay.getPesterminatorFortune(itemStack)
+
         val abilityFortune = getAbilityFortune(internalName, itemLore)
 
         val ffdFortune = itemStack.getFarmingForDummiesCount() ?: 0
@@ -65,12 +67,13 @@ class ToolTooltipTweaks {
         for (line in iterator) {
             val match = tooltipFortunePattern.matchEntire(line)?.groups
             if (match != null) {
-                val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune
+                val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune + pesterminatorFortune
 
                 FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune)
 
                 val displayedFortune = FarmingFortuneDisplay.displayedFortune
                 val reforgeFortune = FarmingFortuneDisplay.reforgeFortune
+                val gemstoneFortune = FarmingFortuneDisplay.gemstoneFortune
                 val baseFortune = FarmingFortuneDisplay.itemBaseFortune
                 val greenThumbFortune = FarmingFortuneDisplay.greenThumbFortune
 
@@ -78,12 +81,13 @@ class ToolTooltipTweaks {
 
                 val ffdString = if (ffdFortune != 0) " §2(+${ffdFortune.formatStat()})" else ""
                 val reforgeString = if (reforgeFortune != 0.0) " §9(+${reforgeFortune.formatStat()})" else ""
+                val gemstoneString = if (gemstoneFortune != 0.0) " §d(+${gemstoneFortune.formatStat()})" else ""
                 val cropString = if (hiddenFortune != 0.0) " §6[+${hiddenFortune.roundToInt()}]" else ""
 
                 val fortuneLine = when (config.cropTooltipFortune) {
-                    CropTooltipFortuneEntry.DEFAULT -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
-                    CropTooltipFortuneEntry.SHOW -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
-                    else -> "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
+                    CropTooltipFortuneEntry.DEFAULT -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$gemstoneString"
+                    CropTooltipFortuneEntry.SHOW -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$gemstoneString$cropString"
+                    else -> "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$gemstoneString$cropString"
                 }
                 iterator.set(fortuneLine)
 
@@ -91,11 +95,13 @@ class ToolTooltipTweaks {
                     iterator.addStat("  §7Base: §6+", baseFortune)
                     iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7${reforgeName?.removeColor()}: §9+", reforgeFortune)
+                    iterator.addStat("  §7Gemstone: §d+", gemstoneFortune)
                     iterator.addStat("  §7Ability: §2+", abilityFortune)
                     iterator.addStat("  §7Green Thumb: §a+", greenThumbFortune)
                     iterator.addStat("  §7Sunder: §a+", sunderFortune)
                     iterator.addStat("  §7Harvesting: §a+", harvestingFortune)
                     iterator.addStat("  §7Cultivating: §a+", cultivatingFortune)
+                    iterator.addStat("  §7Pesterminator: §a+", pesterminatorFortune)
                     iterator.addStat("  §7Farming for Dummies: §2+", ffdFortune)
                     iterator.addStat("  §7Counter: §6+", counterFortune)
                     iterator.addStat("  §7Collection: §6+", collectionFortune)
