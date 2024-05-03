@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.data.hypixel.chat.PlayerChatManager
 import at.hannibal2.skyhanni.data.hypixel.chat.PlayerNameFormatter
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
@@ -271,12 +272,15 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialsFromBazaar
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryBarnManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryInventory
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryKeybinds
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryShortcut
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTooltip
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTooltipCompact
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUpgradeWarning
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
@@ -467,7 +471,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.18",
+    version = "0.25.Beta.19",
 )
 class SkyHanniMod {
 
@@ -542,6 +546,7 @@ class SkyHanniMod {
         loadModule(ChromaManager)
         loadModule(ContributorManager)
         loadModule(TabComplete)
+        loadModule(HypixelBazaarFetcher)
 
         // APIs
         loadModule(BazaarApi())
@@ -633,6 +638,7 @@ class SkyHanniMod {
         loadModule(SkyblockXPInChat())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
+        loadModule(ChocolateFactoryDataLoader)
         loadModule(ChocolateFactoryBarnManager)
         loadModule(ChocolateFactoryShortcut())
         loadModule(ChocolateFactoryInventory)
@@ -640,7 +646,9 @@ class SkyHanniMod {
         loadModule(ChocolateFactoryTooltipCompact)
         loadModule(ChocolateFactoryTimeTowerManager)
         loadModule(ChocolateFactoryTooltip)
+        loadModule(ChocolateFactoryKeybinds)
         loadModule(ChocolateShopPrice)
+        loadModule(ChocolateFactoryUpgradeWarning)
         loadModule(HoppityNpc)
         loadModule(HoppityEggsManager)
         loadModule(HoppityEggLocator)
